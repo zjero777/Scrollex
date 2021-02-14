@@ -1,19 +1,28 @@
 # Pygame шаблон - скелет для нового проекта Pygame
 import pygame
 import random
+
 from gameconst import *
 from player import *
 from utils import *
+from mob import *
+from bullet import *
 
 # создаем игру и окно
 pygame.init()
 pygame.mixer.init()  # для звука
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-pygame.display.set_caption("Scrollex")
+pygame.display.set_caption( "Scrollex")
 clock = pygame.time.Clock()
-all_sprites = pygame.sprite.Group() 
 player = Player()
 all_sprites.add(player)
+
+random.seed()
+for i in range(20):
+    m = Mob()
+    all_sprites.add(m)
+    mobs.add(m)
+
 
 runing = True
 while runing:
@@ -25,9 +34,22 @@ while runing:
         # check for closing window
         if event.type == pygame.QUIT:
             runing = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.shoot()
 
     # Обновление
     all_sprites.update()
+
+    hits = pygame.sprite.spritecollide(player, mobs, False)
+    if hits:
+        runing = False
+
+    hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
+    for hit in hits:
+        m = Mob()
+        all_sprites.add(m)
+        mobs.add(m)
 
     # Рендеринг
     screen.fill(BLACK)

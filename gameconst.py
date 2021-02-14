@@ -1,3 +1,5 @@
+import pygame
+
 WIN_WIDTH = 1920  # ширина игрового окна
 WIN_HEIGHT = 1080 # высота игрового окна
 FPS = 60 # частота кадров в секунду
@@ -7,3 +9,9 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+
+all_sprites = pygame.sprite.Group()
+mobs = pygame.sprite.Group() 
+bullets = pygame.sprite.Group() 
+

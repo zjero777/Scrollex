@@ -1,5 +1,7 @@
 import pygame
 from gameconst import *
+from bullet import *
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -22,4 +24,9 @@ class Player(pygame.sprite.Sprite):
         if self.rect.right > WIN_WIDTH:
             self.rect.right = WIN_WIDTH
         if self.rect.left < 0:
-            self.rect.left = 0        
+            self.rect.left = 0      
+
+    def shoot(self):
+        bullet = Bullet(self.rect.centerx, self.rect.top)
+        all_sprites.add(bullet)
+        bullets.add(bullet)
