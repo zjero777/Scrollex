@@ -3,6 +3,10 @@ from gameconst import *
 
 font_name = pygame.font.match_font('arial')
 
+all_sprites = pygame.sprite.Group()
+mobs = pygame.sprite.Group() 
+bullets = pygame.sprite.Group() 
+
 def draw_text(surf, text, size, x, y):
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, WHITE)
