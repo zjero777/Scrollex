@@ -5,13 +5,14 @@ from utils import *
 
 from os import path
 img_dir = path.join(path.dirname(__file__), 'img')
+snd_dir = path.join(path.dirname(__file__), 'snd')
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.player_img = pygame.image.load(path.join(img_dir, "ship-sprite-394x347-2.png")).convert()
-        self.player_img = pygame.transform.scale(self.player_img, (50, 38))
-        self.player_img.set_colorkey(GREEN)
+        self.player_img = pygame.image.load(path.join(img_dir, "jet.png")).convert_alpha()
+        self.player_img = pygame.transform.scale(self.player_img, (50, 70))
 
         self.image = self.player_img
         self.rect = self.image.get_rect()
@@ -23,6 +24,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = WIN_HEIGHT - 10
         self.speedx = 0        
 
+        self.shoot_delay = 250
+        self.last_shot = pygame.time.get_ticks()
+
+        # Загрузка мелодий игры
+        self.shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser_Shoot43.wav'))
+
     def update(self):
         
         self.speedx = 0
@@ -31,6 +38,8 @@ class Player(pygame.sprite.Sprite):
             self.speedx = -8
         if keystate[pygame.K_RIGHT]:
             self.speedx = 8
+        if keystate[pygame.K_SPACE]:
+            self.shoot()
         self.rect.x += self.speedx
         if self.rect.right > WIN_WIDTH:
             self.rect.right = WIN_WIDTH
@@ -39,6 +48,10 @@ class Player(pygame.sprite.Sprite):
         
 
     def shoot(self):
-        bullet = Bullet(self.rect.centerx, self.rect.top)
-        all_sprites.add(bullet)
-        bullets.add(bullet)
+        now = pygame.time.get_ticks()
+        if now - self.last_shot > self.shoot_delay:
+            self.last_shot = now
+            bullet = Bullet(self.rect.centerx, self.rect.top)
+            all_sprites.add(bullet)
+            bullets.add(bullet)
+            self.shoot_sound.play().set_volume(0.04)
