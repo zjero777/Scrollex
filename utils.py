@@ -1,4 +1,5 @@
 import pygame
+import pygame_gui
 from gameconst import *
 
 
@@ -7,7 +8,6 @@ font_name = pygame.font.match_font('arial')
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group() 
 bullets = pygame.sprite.Group() 
-
 
 def draw_text(surf, text, size, x, y):
     font = pygame.font.Font(font_name, size)
@@ -52,5 +52,5 @@ class spritesheet(object):
     def images_slice(self, column, rows, colorkey = None):
         rect = self.sheet.get_rect()
         tups = [(rect[0]+rect[2]*y//column, rect[1]+rect[2]*x//rows, rect[2]//column, rect[3]//rows) for x in range(column) for y in range(rows)]
-        print(tups)
+        #print(tups)
         return self.images_at(tups, colorkey)

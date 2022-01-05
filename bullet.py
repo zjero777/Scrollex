@@ -1,5 +1,4 @@
 import pygame
-import random
 
 from gameconst import *
 from os import path
@@ -14,10 +13,10 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x
-        self.speedy = -10
+        self.speedy = -1
 
-    def update(self):
-        self.rect.y += self.speedy
+    def update(self, dt):
+        self.rect.y += self.speedy*dt
         # убить, если он заходит за верхнюю часть экрана
         if self.rect.bottom < 0:
             self.kill()

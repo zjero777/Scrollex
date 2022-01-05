@@ -3,9 +3,6 @@ from gameconst import *
 from bullet import *
 from utils import *
 
-from os import path
-img_dir = path.join(path.dirname(__file__), 'img')
-snd_dir = path.join(path.dirname(__file__), 'snd')
 
 
 class Player(pygame.sprite.Sprite):
@@ -30,17 +27,19 @@ class Player(pygame.sprite.Sprite):
         # Загрузка мелодий игры
         self.shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser_Shoot43.wav'))
 
-    def update(self):
+    def update(self, dt):
+        #time_factor = self.dt*FPS        
         
         self.speedx = 0
         keystate = pygame.key.get_pressed()
-        if keystate[pygame.K_LEFT]:
-            self.speedx = -8
-        if keystate[pygame.K_RIGHT]:
-            self.speedx = 8
-        if keystate[pygame.K_SPACE]:
+        mousestate = pygame.mouse.get_pressed()
+        if keystate[pygame.K_a]:
+            self.speedx = -0.8
+        if keystate[pygame.K_d]:
+            self.speedx = 0.8
+        if mousestate[0]:
             self.shoot()
-        self.rect.x += self.speedx
+        self.rect.x += self.speedx*dt
         if self.rect.right > WIN_WIDTH:
             self.rect.right = WIN_WIDTH
         if self.rect.left < 0:
