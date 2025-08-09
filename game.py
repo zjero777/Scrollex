@@ -8,7 +8,7 @@ class Game(object):
         self.entity = []
         self.load_music = False
         self.setPause = False
-        self.active = self
+        self.active = None # Changed from self to None
         self.parent = self
         self.clock = pygame.time.Clock()
         self.paused = False
@@ -21,6 +21,7 @@ class Game(object):
 
     def SetPause(self, pause_state):
         self.paused = pause_state
+        self.running = not pause_state # Added this line
         if self.paused:
             pygame.mixer.music.pause()
         else:
@@ -63,10 +64,12 @@ class Game(object):
 
     def update(self):
         self.dt = self.clock.tick(FPS)
-        if self.active and self.active.running:
-            self.active.update(self.dt)
+        for entity in self.entity:
+            if entity.running:
+                entity.update(self.dt)
 
     def draw(self):
-        if self.active and self.active.running:
-            self.active.draw()
+        for entity in self.entity:
+            if entity.running:
+                entity.draw()
         pygame.display.flip()

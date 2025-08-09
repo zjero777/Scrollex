@@ -33,6 +33,7 @@ class GameOver(Game):
                 self.running = False
                 self.parent.running = False
             if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
+                print("RETURN key pressed in GameOver screen!")
                 self.running = False
                 self.parent.start(Main_menu)
                 

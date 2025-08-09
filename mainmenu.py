@@ -37,7 +37,7 @@ class Main_menu(Game):
             # check for closing window
             if event.type == pygame.QUIT:
                 self.running = False
-                self.parent.running = False
+                self.parent.SetPause(True) # Changed from self.parent.running = False
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == self.start_button:
@@ -46,6 +46,6 @@ class Main_menu(Game):
                         self.running = False
                     if event.ui_element == self.quit_button:
                         self.running = False
-                        self.parent.running = False
+                        self.parent.SetPause(True) # Changed from self.parent.running = False
             self.manager.process_events(event)
         self.manager.update(dt)
