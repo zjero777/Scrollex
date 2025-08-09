@@ -31,11 +31,12 @@ class Player(Component):
     acceleration: float = 0.002
     friction: float = 0.98
     max_speed: float = 0.28
-    shield: float = 100.0
-    max_shield: float = 100.0
-    hull: float = 100.0
-    max_hull: float = 100.0
+    shield: float = 30.0
+    max_shield: float = 10.0
+    hull: float = 50.0
+    max_hull: float = 50.0
     shield_recharge_rate: float = 2.0 # points per second
+    mass: float = 10.0 # Added mass for collision physics
 
 @dataclass
 class Mob(Component):

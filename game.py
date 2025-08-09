@@ -32,7 +32,9 @@ class Game(object):
 
     def start(self, entity, new_game=False, **kwargs):
         # print(f"Starting {entity.__name__}")
-        if new_game:
+        from gameover import GameOver # Import GameOver locally to break circular dependency
+
+        if new_game or entity == GameOver: # Always create new instance for GameOver
             for i, e in enumerate(self.entity):
                 if isinstance(e, entity):
                     self.entity.pop(i)

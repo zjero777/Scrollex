@@ -6,7 +6,6 @@ from utils import draw_text, WIN_WIDTH, WIN_HEIGHT, BLACK, Button, img_dir, path
 
 class GameOver(Game):
     def __init__(self, screen, score):
-        # print("Initializing GameOver")
         super().__init__(screen)
         self.running = False
         self.score = score
@@ -18,7 +17,6 @@ class GameOver(Game):
                                                           text='New Game',
                                                           manager=self.manager)
         
-
     def draw(self):
         self.screen.blit(self.background, self.background_rect)
 
@@ -46,4 +44,3 @@ class GameOver(Game):
 
             self.manager.process_events(event)
         self.manager.update(dt)
-

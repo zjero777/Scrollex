@@ -12,6 +12,7 @@ from systems import (
 from gameconst import *
 from utils import *
 from game import Game
+from gameover import GameOver
 
 class ScrollexGame(Game):
     def __init__(self, screen):
@@ -65,7 +66,7 @@ class ScrollexGame(Game):
         )
 
         # Slow stars
-        slow_stars = create_starfield(WIN_WIDTH, WIN_HEIGHT, 200, (100, 100, 100), (0.5, 1.5))
+        slow_stars = create_starfield(WIN_WIDTH, WIN_HEIGHT, 200, (150, 150, 150), (0.5, 1.5))
         for i in range(2):
             self.world.create_entity(
                 Position(WIN_WIDTH / 2, i * WIN_HEIGHT - WIN_HEIGHT / 2),
@@ -123,4 +124,14 @@ class ScrollexGame(Game):
 
     def check_player_death(self):
         if not any(self.world.get_entities_with_components(PlayerInput)):
-            self.running = False
+            # Get the game state to pass the score to GameOver screen
+            game_state_entity = next(iter(self.world.get_entities_with_components(GameState)), None)
+            
+            if game_state_entity:
+                score = game_state_entity[1][0].score
+            else:
+                score = 0
+
+            from gameover import GameOver
+            self.parent.start(GameOver, score=score)
+            self.running = False # Stop the current game loop

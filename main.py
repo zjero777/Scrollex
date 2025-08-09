@@ -19,7 +19,7 @@ game = Game(screen)
 game.add(Main_menu(screen))
 game.add(ScrollexGame(screen))
 game.add(Pause_menu(screen))
-game.add(GameOver(screen, score=0))
+# Removed premature instantiation of GameOver
 
 game.start(Main_menu)
 

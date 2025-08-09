@@ -170,32 +170,77 @@ class CollisionSystem(System):
         # Check for collisions between players and mobs
         for player_id, (p_pos, p_col, _) in players:
             player = self.world.get_component(player_id, Player)
-            if not player:
+            player_velocity = self.world.get_component(player_id, Velocity)
+            if not player or not player_velocity:
                 continue
 
-            for mob_id, (m_pos, m_col, mob, _, __) in mobs:
+            for mob_id, (m_pos, m_col, mob, m_vel, __) in mobs:
                 # Check if mob still exists
                 if self.world.get_component(mob_id, Mob):
                     dist_sq = (p_pos.x - m_pos.x)**2 + (p_pos.y - m_pos.y)**2
                     if dist_sq < (p_col.radius + m_col.radius)**2:
-                        # Mob is destroyed on collision
-                        self.world.remove_entity(mob_id)
-                        self.create_explosion(m_pos, 'sm')
-
-                        # Damage calculation
-                        mob_damage = mob.health # Let's say mob damage is its health
+                        # Damage calculation for player
+                        mob_damage_to_player = mob.health # Mob damage to player is its health
                         
                         if player.shield > 0:
-                            player.shield -= mob_damage
+                            player.shield -= mob_damage_to_player
                             if player.shield < 0:
                                 player.hull += player.shield # shield is negative, so this subtracts
                                 player.shield = 0
                         else:
-                            player.hull -= mob_damage
+                            player.hull -= mob_damage_to_player
 
                         if player.hull <= 0:
                             self.world.remove_entity(player_id)
                             self.create_explosion(p_pos, 'lg') # bigger explosion for player
+
+                        # Collision resolution (similar to mob-mob collision)
+                        if dist_sq == 0:
+                            continue
+
+                        dx = p_pos.x - m_pos.x
+                        dy = p_pos.y - m_pos.y
+                        dist = (dist_sq)**0.5
+
+                        # Normalize the collision vector
+                        nx = dx / dist
+                        ny = dy / dist
+
+                        # Relative velocity
+                        rvx = player_velocity.dx - m_vel.dx
+                        rvy = player_velocity.dy - m_vel.dy
+
+                        # Velocity along the normal
+                        vel_along_normal = rvx * nx + rvy * ny
+
+                        # Do not resolve if velocities are separating
+                        if vel_along_normal > 0:
+                            continue
+                        
+                        # Coefficient of restitution (e.g., 0.8 for a somewhat bouncy collision)
+                        e = 0.8
+
+                        # Calculate impulse scalar
+                        impulse_scalar = -(1 + e) * vel_along_normal
+                        impulse_scalar /= (1 / player.mass) + (1 / mob.mass)
+
+                        # Apply impulse
+                        impulse_x = impulse_scalar * nx
+                        impulse_y = impulse_scalar * ny
+                        
+                        player_velocity.dx += impulse_x / player.mass
+                        player_velocity.dy += impulse_y / player.mass
+                        m_vel.dx -= impulse_x / mob.mass
+                        m_vel.dy -= impulse_y / mob.mass
+
+                        # Damage calculation for mob based on impulse and player mass
+                        player_collision_damage_factor = 0.1 # Adjust this value for desired damage
+                        mob.health -= abs(impulse_scalar) * player_collision_damage_factor
+                        
+                        if mob.health <= 0:
+                            self.world.remove_entity(mob_id)
+                            self.create_explosion(m_pos, 'sm')
+                            self.create_loot(m_pos)
 
         # Check for collisions between mobs
         for i in range(len(mobs)):
