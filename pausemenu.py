@@ -9,6 +9,7 @@ class Pause_menu(Game):
     def __init__(self, screen):
         super().__init__(screen)
         self.running = False
+        self.paused = True # Added this line
         self.background = pygame.image.load(
             path.join(img_dir, 'bg1920.jpg')).convert()
         self.background_rect = self.background.get_rect()

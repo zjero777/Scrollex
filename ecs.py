@@ -23,13 +23,17 @@ class World:
     def remove_entity(self, entity_id):
         """Mark an entity for removal at the end of the frame."""
         self.entities_to_remove.add(entity_id)
+        
 
     def cleanup_entities(self):
         """Remove all entities marked for deletion."""
+        
         for entity_id in self.entities_to_remove:
             if entity_id in self.entities:
                 del self.entities[entity_id]
+                
         self.entities_to_remove.clear()
+        
 
     def clear_all_entities(self):
         """Remove all entities from the world."""
@@ -48,7 +52,9 @@ class World:
 
     def get_component(self, entity_id, component_type):
         """Get a component from an entity."""
-        return self.entities.get(entity_id, {}).get(component_type)
+        component = self.entities.get(entity_id, {}).get(component_type)
+        
+        return component
 
     def get_entities_with_components(self, *component_types):
         """Get all entities that have a certain set of components."""

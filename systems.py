@@ -145,11 +145,12 @@ class CollisionSystem(System):
         players = list(self.world.get_entities_with_components(Position, Collision, PlayerInput))
 
         # Check for collisions between bullets and mobs
+        bullets_to_remove = set() # Use a set for efficient lookups and to avoid duplicates
         for bullet_id, (b_pos, b_col, bullet) in bullets:
             for mob_id, (m_pos, m_col, mob, _, __) in mobs:
                 dist_sq = (b_pos.x - m_pos.x)**2 + (b_pos.y - m_pos.y)**2
                 if dist_sq < (b_col.radius + m_col.radius)**2:
-                    self.world.remove_entity(bullet_id)
+                    bullets_to_remove.add(bullet_id) # Add bullet to removal list
                     mob.health -= bullet.damage
                     channel = random.choice(self.hit_sounds).play()
                     if channel:
@@ -166,6 +167,10 @@ class CollisionSystem(System):
                         explosion_size = 'lg' if mob.type == 'large' else 'sm'
                         self.create_explosion(m_pos, explosion_size)
                         self.create_loot(m_pos)
+
+        # Remove bullets after all collisions have been processed
+        for bullet_id in bullets_to_remove:
+            self.world.remove_entity(bullet_id)
 
         # Check for collisions between players and mobs
         for player_id, (p_pos, p_col, _) in players:
@@ -303,7 +308,7 @@ class CollisionSystem(System):
             Position(position.x, position.y),
             Sprite(anim[0], anim[0].get_rect(), layer=3),
             Animation(frames=anim, speed=50),
-            Lifetime(duration=len(anim) * 50, created_at=pygame.time.get_ticks())
+            Lifetime(time_to_live=len(anim) * 50)
         )
 
     def create_loot(self, position):
@@ -345,7 +350,7 @@ class CollisionSystem(System):
                 Position(position.x, position.y),
                 Velocity(dx=random.uniform(-0.3, 0.3), dy=random.uniform(-0.3, 0.3)),
                 Sprite(particle_surface, particle_surface.get_rect(), layer=3),
-                Lifetime(duration=random.randint(100, 300), created_at=pygame.time.get_ticks())
+                Lifetime(time_to_live=random.randint(100, 300))
             )
 
 class AnimationSystem(System):
@@ -360,7 +365,8 @@ class AnimationSystem(System):
 class LifetimeSystem(System):
     def process(self, dt):
         for entity_id, (lifetime,) in self.world.get_entities_with_components(Lifetime):
-            if pygame.time.get_ticks() - lifetime.created_at > lifetime.duration:
+            lifetime.time_to_live -= dt
+            if lifetime.time_to_live <= 0:
                 self.world.remove_entity(entity_id)
 
 class BoundarySystem(System):
