@@ -25,6 +25,9 @@ class ScrollexGame(Game):
         self.create_game_state()
         self.setup_systems()
         self.create_background()
+        pygame.mixer.music.load(path.join(snd_dir, 'Dee Zee - Power of Ten.mp3'))
+        pygame.mixer.music.set_volume(0.12)
+        pygame.mixer.music.play(loops=-1, fade_ms=2000)
 
     def load_assets(self):
         self.bg_images = [
@@ -102,18 +105,21 @@ class ScrollexGame(Game):
 
     
 
-    def events(self):
-        for event in pygame.event.get():
+    def update(self, dt, events):
+        for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
                 self.parent.running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     from pausemenu import Pause_menu
+                    pygame.mixer.music.pause()
+                    self.parent.SetPause(True)
                     self.parent.start(Pause_menu)
 
-    def update(self, dt):
-        self.events()
+        if self.parent.GetPaused():
+            return
+            
         self.world.process_update(dt)
         self.check_player_death()
         
@@ -133,5 +139,6 @@ class ScrollexGame(Game):
                 score = 0
 
             from gameover import GameOver
+            pygame.mixer.music.stop()
             self.parent.start(GameOver, score=score)
             self.running = False # Stop the current game loop

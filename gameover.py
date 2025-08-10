@@ -1,7 +1,7 @@
 import pygame
 import pygame_gui
 from game import Game
-from utils import draw_text, WIN_WIDTH, WIN_HEIGHT, BLACK, Button, img_dir, path
+from utils import draw_text, WIN_WIDTH, WIN_HEIGHT, BLACK, Button, img_dir, path, snd_dir
 
 
 class GameOver(Game):
@@ -17,6 +17,11 @@ class GameOver(Game):
                                                           text='New Game',
                                                           manager=self.manager)
         
+    def init(self):
+        pygame.mixer.music.load(path.join(snd_dir, 'Deep Space Destructors - From The Ashes.mp3'))
+        pygame.mixer.music.set_volume(0.1)
+        pygame.mixer.music.play(loops=-1, fade_ms=1000)
+
     def draw(self):
         self.screen.blit(self.background, self.background_rect)
 
@@ -25,21 +30,23 @@ class GameOver(Game):
         self.manager.draw_ui(self.screen)
         
 
-    def update(self, dt):
+    def update(self, dt, events):
         from mainmenu import Main_menu
 
-        for event in pygame.event.get():
+        for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
                 self.parent.running = False
             if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
                 print("RETURN key pressed in GameOver screen!")
+                pygame.mixer.music.stop()
                 self.running = False
                 self.parent.start(Main_menu)
                 
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == self.newgame_button:
+                        pygame.mixer.music.stop()
                         self.running = False
                         self.parent.start(Main_menu)
 

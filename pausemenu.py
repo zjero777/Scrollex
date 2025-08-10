@@ -3,6 +3,7 @@ import pygame_gui
 
 from game import Game
 from utils import *
+from scrollex import ScrollexGame
 
 
 class Pause_menu(Game):
@@ -25,19 +26,24 @@ class Pause_menu(Game):
         # self.screen.blit(self.background, self.background_rect)
         self.manager.draw_ui(self.screen)
 
-    def update(self, dt):
-        for event in pygame.event.get():
+    def update(self, dt, events):
+        for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
                 self.parent.running = False
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == self.resume_button:
-                        from scrollex import ScrollexGame
-                        self.running = False
-                        self.parent.active = self.parent.getEntity(ScrollexGame)
+                        game_instance = self.parent.getEntity(ScrollexGame)
+                        if game_instance:
+                            pygame.mixer.music.unpause()
+                            self.parent.SetPause(False)
+                            self.running = False
+                            self.parent.active = game_instance
                     if event.ui_element == self.quit_button:
                         from mainmenu import Main_menu
+                        pygame.mixer.music.stop()
+                        self.parent.SetPause(False)
                         self.running = False
                         self.parent.start(Main_menu)
 

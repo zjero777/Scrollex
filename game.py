@@ -21,11 +21,6 @@ class Game(object):
 
     def SetPause(self, pause_state):
         self.paused = pause_state
-        self.running = not pause_state # Added this line
-        if self.paused:
-            pygame.mixer.music.pause()
-        else:
-            pygame.mixer.music.unpause()
 
     def add(self, game, setPause=True):
         self.entity.append(game)
@@ -51,11 +46,11 @@ class Game(object):
         game.running = True
         self.active = game
         self.active.parent = self
+        self.active.init()
         if game.GetPaused():
             for i in self.entity:
                 if i != Game and i != game:
                     i.SetPause(True)
-        game.init()
 
     def getEntity(self, entity):
         for i in self.entity:
@@ -64,12 +59,18 @@ class Game(object):
 
     def update(self):
         self.dt = self.clock.tick(FPS)
-        for entity in self.entity:
-            if entity.running:
-                entity.update(self.dt)
+        events = pygame.event.get()
+        if self.active and self.active.running:
+            self.active.update(self.dt, events)
 
     def draw(self):
-        for entity in self.entity:
-            if entity.running:
-                entity.draw()
+        from scrollex import ScrollexGame
+        if self.paused:
+            game_instance = self.getEntity(ScrollexGame)
+            if game_instance:
+                game_instance.draw()
+        
+        if self.active and self.active.running:
+            self.active.draw()
+
         pygame.display.flip()
